@@ -2,6 +2,8 @@ import React from 'react';
 import Enzyme, { shallow } from 'enzyme';
 import EnzymeAdapter from 'enzyme-adapter-react-16';
 import App from './App';
+import LogoImage from './logo.svg';
+import MatrixImage from './matrix.jpg';
 
 Enzyme.configure({ adapter: new EnzymeAdapter() });
 
@@ -32,81 +34,172 @@ const findByTestAttr = (wrapper, val) => {
   return wrapper.find(`[data-test="${val}"]`);
 }
 
-// test('App renders without error', () => {
-//   const wrapper = setup();
-//   const appComponent = wrapper.find("[data-test='component-app']");
-//   expect(appComponent.length).toBe(1);
-// });
+//RENDERING  
 
-test('App renders without error', () => {
-  const wrapper = setup();
-  const appComponent = findByTestAttr(wrapper, 'component-app');
-  expect(appComponent.length).toBe(1);
+describe('Components and buttons are rendered without error', () => {
+  let wrapper;
+  beforeEach(() => {
+    wrapper = setup();
+  });
+  test('App renders', () => {
+    const appComponent = findByTestAttr(wrapper, 'component-app');
+    expect(appComponent.length).toBe(1);
+  });
+  test('Top image renders', () => {
+    const topImage = findByTestAttr(wrapper, 'top-image');
+    expect(topImage.length).toBe(1);
+  })
+  test('Increment button renders', () => {
+    const incrementButton = findByTestAttr(wrapper, 'increment-button');
+    expect(incrementButton.length).toBe(1);
+  });
+  test('Decrement button renders', () => {
+    const decrementButton = findByTestAttr(wrapper, 'decrement-button');
+    expect(decrementButton.length).toBe(1);
+  });
+  
+  test('Reset button renders', () => {
+    const resetButton = findByTestAttr(wrapper, 'reset-button');
+    expect(resetButton.length).toBe(1);
+  });
+  
+  test('Counter display renders', () => {
+    const counterDisplay = findByTestAttr(wrapper, 'counter-display');
+    expect(counterDisplay.length).toBe(1);
+  });  
 });
 
-test('App renders increment button', () => {
-  const wrapper = setup();
-  const incrementButton = findByTestAttr(wrapper, 'increment-button');
-  expect(incrementButton.length).toBe(1);
-});
+//RIGHT IMAGE IS RENDERED 
 
-test('App renders reset button', () => {
-  const wrapper = setup();
-  const resetButton = findByTestAttr(wrapper, 'reset-button');
-  expect(resetButton.length).toBe(1);
-});
-
-test('App renders counter display', () => {
-  const wrapper = shallow(<App />);
-  const counterDisplay = findByTestAttr(wrapper, 'counter-display');
-  expect(counterDisplay.length).toBe(1);
-});
-
-test('Counter starts at 0', () => {
-  const wrapper = setup();
-  const initialCounterState = wrapper.state('counter');
-  expect(initialCounterState).toBe(0);
-
-});
-
-test('Clicking increment button increments counter display', () => {
-  const counter = 7;
-  const wrapper = setup(null, { counter });
-
-  // find button and click
-  const incrementButton = findByTestAttr(wrapper, 'increment-button');
-  incrementButton.simulate('click');
-  wrapper.update();
-
-  // find display and test value
-  const counterDisplay = findByTestAttr(wrapper, 'counter-display');
-  expect(counterDisplay.text()).toContain(counter + 1)
-});
-
-test('Clickint decrement button decrements counter display', () => {
-  const counter = 7;
-  const wrapper = setup(null, { counter });
-
-  //find button and click
-  const decrementButton = findByTestAttr(wrapper, 'decrement-button');
-  decrementButton.simulate('click');
-  wrapper.update();
-
-  //find display and test value
-  const counterDisplay = findByTestAttr(wrapper, 'counter-display');
-  expect(counterDisplay.text()).toContain(counter - 1);
+describe('App renders correct image', () => {
+  let wrapper;
+  beforeEach(() => {
+    wrapper = setup();
+  })
+  test('top image is matrix', () => {
+    const topImage = findByTestAttr(wrapper, 'top-image');
+    expect(topImage.prop("src")).toEqual(LogoImage);
+  });
 })
 
-test('Clicking reset button returns counter display to 0', () => {
-  const wrapper = setup(null, {counter: 100});
+//BUTTONS 
 
-  // find button and click
-  const resetButton = findByTestAttr(wrapper, 'reset-button');
-  resetButton.simulate('click');
-  wrapper.update();
+describe('Buttons work', () => {
+  let wrapper;
+  let counter;
 
-  // find display and test value
-  const counterDisplay = findByTestAttr(wrapper, 'counter-display');
-  expect(counterDisplay.text()).toContain(0)
+  beforeEach(() => {
+    counter = 7;
+    wrapper = setup(null, { counter });    
+  });
+
+  test('Increment button works', () => {
+    // find button and click
+    const incrementButton = findByTestAttr(wrapper, 'increment-button');
+    incrementButton.simulate('click');
+    wrapper.update();
+  
+    // find display and test value
+    const counterDisplay = findByTestAttr(wrapper, 'counter-display');
+    expect(counterDisplay.text()).toContain(counter + 1)
+  });
+  
+  test('Decrement button works', () => {
+    //find button and click
+    const decrementButton = findByTestAttr(wrapper, 'decrement-button');
+    decrementButton.simulate('click');
+    wrapper.update();
+  
+    //find display and test value
+    const counterDisplay = findByTestAttr(wrapper, 'counter-display');
+    expect(counterDisplay.text()).toContain(counter - 1);
+  });
+
+  test('Reset button works', () => {
+    // find button and click
+    const resetButton = findByTestAttr(wrapper, 'reset-button');
+    resetButton.simulate('click');
+    wrapper.update();
+  
+    // find display and test value
+    const counterDisplay = findByTestAttr(wrapper, 'counter-display');
+    expect(counterDisplay.text()).toContain(0)
+  });
 });
 
+//COUNTER 
+
+describe('Counter display', () => {
+  let wrapper;
+  
+  beforeEach(() => {
+    wrapper = setup();
+  });
+
+  test('starts at 0', () => {
+    const initialCounterState = wrapper.state('counter');
+    expect(initialCounterState).toBe(0);  
+  });
+
+  test('does not go lower than 0', () => {
+    //find decrement button and click it
+    const decrementButton = findByTestAttr(wrapper, 'decrement-button');
+    decrementButton.simulate('click');
+    wrapper.update();
+  
+    //find display and test content
+    const counterDisplay = findByTestAttr(wrapper, 'counter-display');
+    expect(counterDisplay.text()).not.toContain(-1);
+  });
+});
+
+//ERROR HANDLING
+
+describe('Error message', () => {
+  let wrapper;
+
+  beforeEach(() => {
+    wrapper = setup();
+  });
+
+  test('shown when counter is 0 and decrement is pressed', () => {
+    //find decrement button and click it
+    const decrementButton = findByTestAttr(wrapper, 'decrement-button');
+    decrementButton.simulate('click');
+    wrapper.update();
+  
+    //error display renders
+    const errorDisplay = findByTestAttr(wrapper, 'error-display');
+    expect(errorDisplay.length).toBe(1);
+  });
+
+  test('not shown when there is no error', () => {
+    //error display does not render
+    const errorDisplay = findByTestAttr(wrapper, 'error-display');
+    expect(errorDisplay.length).toBe(0);
+  });
+})
+
+describe('Error message clears', () => {
+  let wrapper;
+  
+  beforeEach(() => {
+    wrapper = setup(null, {error: true});
+  });
+
+  test('when increment is clicked', () => {
+    const incrementButton = findByTestAttr(wrapper, 'increment-button');
+    incrementButton.simulate('click');
+    wrapper.update();   
+    const errorDisplay = findByTestAttr(wrapper, 'error-display');
+    expect(errorDisplay.length).toBe(0);
+  });
+
+  test('when reset is clicked', () => {
+    const resetButton = findByTestAttr(wrapper, 'reset-button');
+    resetButton.simulate('click');
+    wrapper.update();   
+    const errorDisplay = findByTestAttr(wrapper, 'error-display');
+    expect(errorDisplay.length).toBe(0);
+  });
+});
